@@ -30,23 +30,28 @@
   <div id="output">Classifying...</div>
 
   <script>
-    let model, webcam, labelContainer, maxPredictions;
+    let model;
+    let maxPredictions;
 
     // Load the model when the page loads
     window.onload = async function () {
-      const URL = "https://storage.googleapis.com/tm-model/BKnCe7xrA/"; // Update with your actual model URL
+      const URL = "https://your-model-location/"; // Replace with the actual model URL
       const modelURL = URL + "model.json";
       const metadataURL = URL + "metadata.json";
 
       // Load the Teachable Machine model
-      model = await tmImage.load(modelURL, metadataURL);
-      console.log("Model loaded successfully!");
+      try {
+        model = await tmImage.load(modelURL, metadataURL);
+        console.log("Model loaded successfully!");
+        maxPredictions = model.getTotalClasses();
+      } catch (error) {
+        console.error("Error loading the model:", error);
+      }
 
-      // Set the number of classes in the model
-      maxPredictions = model.getTotalClasses();
-
-      // Initialize the webcam
-      setupWebcam();
+      // Initialize the webcam after the model is loaded
+      if (model) {
+        setupWebcam();
+      }
     };
 
     // Setup webcam
@@ -57,7 +62,7 @@
       });
       video.srcObject = stream;
 
-      // Wait until the video is ready
+      // Wait until the video is ready and start classifying
       video.onloadeddata = () => {
         classifyWebcam(video);
       };
@@ -65,19 +70,4 @@
 
     // Classify webcam input
     async function classifyWebcam(video) {
-      // Predict using the model
-      const prediction = await model.predict(video);
-
-      // Get the top prediction
-      const topPrediction = prediction[0];
-
-      // Display the result in the output div
-      const outputDiv = document.getElementById('output');
-      outputDiv.innerHTML = `Prediction: ${topPrediction.className} (Confidence: ${topPrediction.probability.toFixed(2)})`;
-
-      // Repeat classification every 100ms
-      setTimeout(() => classifyWebcam(video), 100);
-    }
-  </script>
-</body>
-</html>
+      tr
