@@ -6,7 +6,7 @@
   <title>Teachable Machine Webcam Classifier</title>
   <!-- Load TensorFlow.js -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <!-- Load Teachable Machine Image Model Library -->
+  <!-- Load Teachable Machine Image Model Library (for browsers) -->
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
   <style>
     body {
@@ -37,9 +37,8 @@
 
     // Load the model when the page loads
     window.onload = async function () {
-      const URL = "https://storage.googleapis.com/tm-model/BKnCe7xrA/"; // Replace with the actual model URL
-      const modelURL = URL + "model.json";
-      const metadataURL = URL + "metadata.json";
+      const modelURL = "https://your-model-location/model.json"; // Replace with the actual model URL
+      const metadataURL = "https://your-model-location/metadata.json"; // Replace with the actual metadata URL
 
       // Load the Teachable Machine model
       try {
