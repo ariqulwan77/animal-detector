@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teachable Machine Web Integration</title>
+  <title>Teachable Machine Webcam Classifier</title>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
   <style>
@@ -16,20 +16,17 @@
       font-size: 24px;
       margin-top: 20px;
     }
-    #inputImage {
-      margin-top: 30px;
-      width: 200px;
-      height: 200px;
+    #webcam {
+      width: 320px;
+      height: 240px;
       border: 2px solid #ddd;
     }
   </style>
 </head>
 <body>
-  <h1>Teachable Machine Image Classifier</h1>
-  <p>Click on the button to capture an image and classify it using the model.</p>
-  <input type="file" id="imageInput" accept="image/*" onchange="loadImage(event)">
-  <br><br>
-  <img id="inputImage" src="" alt="Upload an image" />
+  <h1>Teachable Machine Webcam Classifier</h1>
+  <p>Use your webcam to classify objects in real-time!</p>
+  <video id="webcam" autoplay></video>
   <div id="output">Classifying...</div>
 
   <script>
@@ -41,35 +38,45 @@
       const modelURL = URL + "model.json";
       const metadataURL = URL + "metadata.json";
 
+      // Load the Teachable Machine model
       model = await tmImage.load(modelURL, metadataURL);
       console.log("Model loaded successfully!");
 
-      // Number of classes in the model
+      // Set the number of classes in the model
       maxPredictions = model.getTotalClasses();
+
+      // Initialize the webcam
+      setupWebcam();
     };
 
-    // Handle image input and classification
-    function loadImage(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const imgElement = document.getElementById('inputImage');
-          imgElement.src = e.target.result;
-          imgElement.onload = function() {
-            classifyImage(imgElement);
-          }
-        };
-        reader.readAsDataURL(file);
-      }
+    // Setup webcam
+    async function setupWebcam() {
+      const video = document.getElementById('webcam');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+      });
+      video.srcObject = stream;
+
+      // Wait until the video is ready
+      video.onloadeddata = () => {
+        classifyWebcam(video);
+      };
     }
 
-    // Classify the image using the loaded model
-    async function classifyImage(image) {
-      const prediction = await model.predict(image);
+    // Classify webcam input
+    async function classifyWebcam(video) {
+      // Predict using the model
+      const prediction = await model.predict(video);
+
+      // Get the top prediction
       const topPrediction = prediction[0];
+
+      // Display the result in the output div
       const outputDiv = document.getElementById('output');
       outputDiv.innerHTML = `Prediction: ${topPrediction.className} (Confidence: ${topPrediction.probability.toFixed(2)})`;
+
+      // Repeat classification every 100ms
+      setTimeout(() => classifyWebcam(video), 100);
     }
   </script>
 </body>
