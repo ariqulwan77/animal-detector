@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -32,12 +33,19 @@
   <div id="output">Classifying...</div>
 
   <script>
-    let model;
+    let model, webcam, labelContainer, maxPredictions;
 
     // Load the model when the page loads
     window.onload = async function () {
-      model = await tmImage.load('https://storage.googleapis.com/tm-model/BKnCe7xrA/model.json', 'https://storage.googleapis.com/tm-model/BKnCe7xrA/metadata.json');
+      const URL = "https://storage.googleapis.com/tm-model/BKnCe7xrA/"; // Update with your actual model URL
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+
+      model = await tmImage.load(modelURL, metadataURL);
       console.log("Model loaded successfully!");
+
+      // Number of classes in the model
+      maxPredictions = model.getTotalClasses();
     };
 
     // Handle image input and classification
