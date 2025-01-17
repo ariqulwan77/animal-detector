@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teachable Machine Webcam Classifier</title>
+  <!-- Load TensorFlow.js -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <!-- Load Teachable Machine Image Model Library -->
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
   <style>
     body {
@@ -41,7 +43,7 @@
 
       // Load the Teachable Machine model
       try {
-        model = await tmImage.load(modelURL, metadataURL);
+        model = await tmImage.load(modelURL, metadataURL); // Using tmImage.load to load the model correctly
         console.log("Model loaded successfully!");
         maxPredictions = model.getTotalClasses();
       } catch (error) {
@@ -70,4 +72,21 @@
 
     // Classify webcam input
     async function classifyWebcam(video) {
-      tr
+      try {
+        // Make a prediction using the model
+        const predictions = await model.predict(video);
+        const topPrediction = predictions[0];
+
+        // Display the prediction
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML = `Prediction: ${topPrediction.className} (Confidence: ${topPrediction.probability.toFixed(2)})`;
+
+        // Repeat classification every 100ms
+        setTimeout(() => classifyWebcam(video), 100);
+      } catch (error) {
+        console.error("Error during prediction:", error);
+      }
+    }
+  </script>
+</body>
+</html>
