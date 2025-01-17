@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teachable Machine Web Integration</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #output {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+    #inputImage {
+      margin-top: 30px;
+      width: 200px;
+      height: 200px;
+      border: 2px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Teachable Machine Image Classifier</h1>
+  <p>Click on the button to capture an image and classify it using the model.</p>
+  <input type="file" id="imageInput" accept="image/*" onchange="loadImage(event)">
+  <br><br>
+  <img id="inputImage" src="" alt="Upload an image" />
+  <div id="output">Classifying...</div>
+
+  <script>
+    let model;
+
+    // Load the model when the page loads
+    window.onload = async function () {
+      model = await tmImage.load('https://storage.googleapis.com/tm-model/BKnCe7xrA/model.json', 'https://storage.googleapis.com/tm-model/BKnCe7xrA/metadata.json');
+      console.log("Model loaded successfully!");
+    };
+
+    // Handle image input and classification
+    function loadImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const imgElement = document.getElementById('inputImage');
+          imgElement.src = e.target.result;
+          imgElement.onload = function() {
+            classifyImage(imgElement);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Classify the image using the loaded model
+    async function classifyImage(image) {
+      const prediction = await model.predict(image);
+      const topPrediction = prediction[0];
+      const outputDiv = document.getElementById('output');
+      outputDiv.innerHTML = `Prediction: ${topPrediction.className} (Confidence: ${topPrediction.probability.toFixed(2)})`;
+    }
+  </script>
+</body>
+</html>
